@@ -1,4 +1,4 @@
-# Gerber Covariance Matrix (Python)
+# Gerber Covariance Matrix Implementation(Python)
 
 I built this project while working on portfolio optimization and looking for a covariance estimate that is more stable than the plain sample covariance matrix.
 
