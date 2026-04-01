@@ -11,40 +11,30 @@ In practice, sample covariance can be noisy and very sensitive to outliers. To a
 
 ## Method
 
-Given returns $r_{i,t}$ for asset $i$ at time $t$:
+Given returns `r[i,t]` for asset `i` at time `t`:
 
-1. Compute asset volatility:
-$$
-\sigma_i = \mathrm{std}(r_i, \mathrm{ddof}=1)
-$$
+1. Compute volatility for each asset  
+   `sigma[i] = std(r[i], ddof=1)`
 
-2. Define thresholded direction indicators using parameter $c$:
-$$
-U_{i,t} = \mathbf{1}(r_{i,t} \ge c\sigma_i), \quad
-D_{i,t} = \mathbf{1}(r_{i,t} \le -c\sigma_i)
-$$
+2. Mark large positive/negative moves using threshold `c`  
+   `U[i,t] = 1 if r[i,t] >= c * sigma[i], else 0`  
+   `D[i,t] = 1 if r[i,t] <= -c * sigma[i], else 0`
 
-3. Count directional co-moves for each pair $(i,j)$:
-$$
-N_{UU}=U^\top U,\quad N_{DD}=D^\top D,\quad N_{UD}=U^\top D,\quad N_{DU}=D^\top U
-$$
+3. Count pairwise co-moves across time  
+   `N_UU = U.T @ U`  
+   `N_DD = D.T @ D`  
+   `N_UD = U.T @ D`  
+   `N_DU = D.T @ U`
 
-4. Compute Gerber correlation:
-$$
-g_{ij}=\frac{N_{UU}+N_{DD}-N_{UD}-N_{DU}}
-{N_{UU}+N_{DD}+N_{UD}+N_{DU}}
-$$
-(with diagonal set to 1)
+4. Build Gerber correlation  
+   `g[i,j] = (N_UU + N_DD - N_UD - N_DU) / (N_UU + N_DD + N_UD + N_DU)`  
+   Diagonal is set to `1.0`.
 
-5. Convert to covariance:
-$$
-\Sigma^{(G)}_{ij}=g_{ij}\sigma_i\sigma_j
-$$
+5. Convert to covariance  
+   `Cov_G[i,j] = g[i,j] * sigma[i] * sigma[j]`
 
-6. Enforce positive semidefiniteness by eigenvalue clipping:
-$$
-\Sigma^{(G)} = Q\,\mathrm{diag}(\max(\lambda_k,\epsilon))\,Q^\top
-$$
+6. Project to PSD (positive semidefinite)  
+   Eigen-decompose covariance, clip negative eigenvalues to `eps`, and reconstruct.
 
 
 ## Python API
