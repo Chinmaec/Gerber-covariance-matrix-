@@ -36,14 +36,3 @@ Given returns `r[i,t]` for asset `i` at time `t`:
 6. Project to PSD (positive semidefinite)  
    Eigen-decompose covariance, clip negative eigenvalues to `eps`, and reconstruct.
 
-
-## Python API
-
-```python
-gerber_covariance(
-    returns_df: pd.DataFrame,
-    c: float = 0.5,
-    eps: float = 1e-10,
-    return_df: bool = True,
-)
-
